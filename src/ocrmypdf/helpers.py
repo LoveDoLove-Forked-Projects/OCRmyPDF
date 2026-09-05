@@ -374,9 +374,19 @@ def pikepdf_get_int(obj: pikepdf.Object, key: pikepdf.Name, default: int = 0) ->
     unboxed to a native ``int`` by the time we see it here; under explicit
     conversion mode it would instead be a ``pikepdf.Object``. ``int()``
     handles both, since ``Object`` implements ``__int__``.
+
+    A malformed PDF may store something that is not a number under the key,
+    for which ``int()`` raises. Fall back to *default* in that case, so that
+    callers reading optional hints out of untrusted files do not have to guard
+    every lookup.
     """
     value = obj.get(key)
-    return int(value) if value is not None else default
+    if value is None:
+        return default
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
 
 
 def pikepdf_get_bool(
@@ -387,13 +397,23 @@ def pikepdf_get_bool(
     Unlike ``int()``/``float()``, ``bool()`` is not supported on
     ``pikepdf.Object`` (it raises), so both conversion modes must be
     handled explicitly. See :func:`pikepdf_get_int` for background.
+
+    In implicit conversion mode a PDF Boolean arrives as a native ``bool``,
+    and a PDF Integer -- which malformed files use in place of a Boolean --
+    arrives as a native ``int``. Neither has ``.as_bool()``, so only values
+    that are still ``pikepdf.Object`` are routed through it.
     """
     value = obj.get(key)
     if value is None:
         return default
     if isinstance(value, bool):
         return value
-    return value.as_bool(default)
+    if isinstance(value, pikepdf.Object):
+        return value.as_bool(default)
+    try:
+        return bool(value)
+    except (TypeError, ValueError):
+        return default
 
 
 def running_in_docker() -> bool:
