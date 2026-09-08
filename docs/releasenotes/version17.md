@@ -3,6 +3,30 @@
 
 # v17
 
+## v17.12.0
+
+**Changes**
+
+- OCRmyPDF now requires pikepdf 10.2 or later, up from pikepdf 10. This is the
+  first release that provides `pikepdf.NamePath`, the `Object.as_int()` family
+  of type-safe accessors, and a thread-local `explicit_conversion()`. OCRmyPDF
+  uses all three to read optional values out of PDFs it did not write.
+
+**Fixes**
+
+- A malformed PDF that stores something other than a dictionary at a
+  structural key -- `/Resources`, `/Resources /XObject`, `/Root /AcroForm`,
+  `/Root /MarkInfo`, `/Root /Names`, `/Root /PieceInfo`, an annotation's `/A`,
+  or an image's `/SMask` -- is now tolerated everywhere rather than in the
+  handful of places that had been hardened individually. Such a file is read as
+  though the key were absent, which is what the well-guarded paths already did.
+- An image XObject with no `/Subtype` no longer raises out of the optimizer.
+- `PdfInfo` no longer aborts on a `/MarkInfo << /Marked 1 >>`, where a producer
+  wrote a flag as an integer instead of a Boolean. Thanks @linhongyu510
+  ({issue}`1742`).
+- A page `/UserUnit` written as a PDF Real is now read exactly rather than via
+  binary floating point, so the digits the file wrote are the digits used.
+
 ## v17.11.0
 
 **Enhancements**

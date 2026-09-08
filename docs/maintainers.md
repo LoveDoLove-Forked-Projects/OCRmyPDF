@@ -137,7 +137,7 @@ Depends:
  python3-coloredlogs,
  python3-deprecation,
  python3-pdfminer (>= 20181108+dfsg-3),
- python3-pikepdf (>= 8.14.0),
+ python3-pikepdf (>= 10.2),
  python3-pil,
  python3-pluggy,
  python3-reportlab,
