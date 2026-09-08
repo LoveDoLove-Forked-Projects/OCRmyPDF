@@ -222,6 +222,15 @@ def check_options(options):
                 gs_version,
                 ghostscript.GS_JPEG_TRUNCATION_FIXED,
             )
+        if ghostscript.tounicode_multichar_bug(gs_version):
+            log.warning(
+                "Ghostscript %s drops ToUnicode mappings that expand to more than "
+                "one character while writing PDF/A, so ligatures and conjuncts "
+                "in complex-script text may not copy or search correctly. "
+                "Please upgrade to Ghostscript %s or later, which fixes this.",
+                gs_version,
+                ghostscript.GS_TOUNICODE_MULTICHAR_FIXED,
+            )
         if options.output_type == 'pdfa':
             options.output_type = 'pdfa-2'
 

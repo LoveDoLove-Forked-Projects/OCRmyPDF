@@ -14,6 +14,17 @@
 
 **Fixes**
 
+- Words containing `fi`, `ff`, `fl` and similar pairs extracted with the
+  letters missing (`con dentiality`, `e ects`) from `--output-type pdfa` files
+  when the PDF/A conversion ran through Ghostscript 10.05.0 through 10.06.x.
+  Those Ghostscript releases drop ToUnicode entries that expand to more than
+  one character (Ghostscript bug 709030, fixed in 10.07.0), and the fpdf2
+  renderer's HarfBuzz shaping had been forming optional Latin ligatures whose
+  entries do exactly that. Invisible text in scripts that do not need shaping
+  is now encoded one glyph per character, so no such entries exist to lose.
+  Complex scripts still get shaped, and OCRmyPDF now warns when an affected
+  Ghostscript is in use, since their conjunct mappings can still be dropped.
+  Thanks @kmn5 ({issue}`1744`).
 - A malformed PDF that stores something other than a dictionary at a
   structural key -- `/Resources`, `/Resources /XObject`, `/Root /AcroForm`,
   `/Root /MarkInfo`, `/Root /Names`, `/Root /PieceInfo`, an annotation's `/A`,
